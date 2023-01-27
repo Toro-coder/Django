@@ -21,9 +21,11 @@ class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
     serializer_class = ArticleSerializer
     queryset = Article.objects.all()
     lookup_field = 'id'
+    # Authenticating
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # retrieving data
     def get(self, request, id=None):
 
         if id:
@@ -31,23 +33,28 @@ class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
         else:
             return self.list(request)
 
+    # adding data
     def post(self, request):
         return self.create(request)
 
+    # Updating data
     def put(self, request, id=None):
         return self.update(request, id)
 
+    # Deleting data
     def delete(self, request, id=None):
         return self.destroy(request, id)
 
 
 # class based views
 class ArticleAPIView(APIView):
+    # retrieving data
     def get(self, request):
         articles = Article.objects.all()
         serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
+    # adding data
     def post(self, request):
         serializer = ArticleSerializer(data=request.data)
 
@@ -63,11 +70,13 @@ class ArticleDetails(APIView):
         except Article.DoesNotExist:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
 
+    # retrieving data
     def get(self, request, id):
         article = self.get_object(id)
         serializer = ArticleSerializer(article)
         return Response(serializer.data)
 
+    # Updating data
     def put(self, request, id):
         article = self.get_object(id)
         serializer = ArticleSerializer(article, data=request.data)
@@ -76,6 +85,7 @@ class ArticleDetails(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # Deleting data
     def delete(self, request, id):
         article = self.get_object(id)
         article.delete()
